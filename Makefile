@@ -1,5 +1,8 @@
 GO_VERSION := 1.21.6
 
+.DEFAULT_GOAL := build
+.PHONY:fmt vet build
+
 setup: install-go init-go 
 
 install-go: 
@@ -17,5 +20,13 @@ upgrade-go:
 	sudo tar -C /usr/local -xzf go$(GO_VERSION).linux-amd64.tar.gz
 	rm go$(GO_VERSION).linux-amd64.tar.gz
 
-build:
+fmt:
+	go fmt ./...
+vet: fmt
+	go vet ./...
+
+build: test
 	go build -o api cmd/main.go
+
+test: vet
+	go test ./...

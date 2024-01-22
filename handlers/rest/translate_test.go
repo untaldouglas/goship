@@ -10,7 +10,7 @@ import (
 )
 
 func TestTranslateAPI(t *testing.T) {
-	tt := []struct { // <1>
+	tt := []struct {
 		Endpoint            string
 		StatusCode          int
 		ExpectedLanguage    string
@@ -27,6 +27,12 @@ func TestTranslateAPI(t *testing.T) {
 			StatusCode:          200,
 			ExpectedLanguage:    "german",
 			ExpectedTranslation: "hallo",
+		},
+		{
+			Endpoint:            "/hello?language=spanish",
+			StatusCode:          404,
+			ExpectedLanguage:    "",
+			ExpectedTranslation: "",
 		},
 	}
 
