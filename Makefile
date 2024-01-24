@@ -37,4 +37,3 @@ coverage:
 
 report:
 	go tool cover -html=coverage.out -o cover.html
-	open cover.html
