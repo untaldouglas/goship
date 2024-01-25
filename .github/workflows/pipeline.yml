@@ -96,7 +96,7 @@ jobs:
   deploy-function:
     name: Deploy FaaS
     runs-on: ubuntu-latest
-    needs: test
+    needs: build
     if: ${{ github.event_name == 'push' && github.ref == 'refs/head/main' }}
     steps:
     - name: Check out code into the Go module directory
