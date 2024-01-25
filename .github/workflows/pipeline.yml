@@ -100,7 +100,7 @@ jobs:
     if: ${{ github.event_name == 'push' && github.ref == 'refs/head/main' }}
     steps:
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v4.1.1
+      uses: actions/checkout@v4 
       with:
         fetch-depth: 0
     - name: Deploy function
@@ -109,7 +109,7 @@ jobs:
       with:
           name: translate
           entry_point: Translate
-          runtime: go121
-        credentials: ${{ secrets.gcp_credentials }}
+          runtime: go116
+          credentials: ${{ secrets.gcp_credentials }}
     - id: test
       run: curl "${{ steps.deploy.outputs.url }}/hello"
