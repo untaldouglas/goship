@@ -1,0 +1,120 @@
+name: CI Checks
+ 
+on:
+  push:
+    branches:                                                
+      - main
+jobs:  
+  test:
+    name: Test Application
+    runs-on: ubuntu-latest                                  
+    steps:
+    - name: Set up Go 1.x                                   
+      uses: actions/setup-go@v5
+      with:
+        go-version: ^1.21.6
+    - name: Check out code into the Go module directory     
+      uses: actions/checkout@v4.1.1
+    - name: Run Test
+      run: make test
+    - name: Coverage Test
+      run: make coverage
+    - name: Generate Coverage Report
+      run: make report
+    - name: Copy files
+      run: |
+           mkdir  reports
+           cp cover.html reports/.
+    - name: Archive
+      uses: actions/upload-artifact@v4.3.0 
+      with:
+          name: reports
+          path: reports
+                                                                     
+  build:
+    name: Build App
+    runs-on: ubuntu-latest   
+    needs: test                                
+    steps:
+ 
+    - name: Set up Go 1.x                                    
+      uses: actions/setup-go@v5
+      with:
+        go-version: ^1.21.6
+ 
+    - name: Check out code into the Go module directory      
+      uses: actions/checkout@v4.1.1
+ 
+    - name: Build
+      run: make build                                        
+ 
+    - name: Copy Files                                       
+      run: |
+           mkdir  artifacts
+           cp api artifacts/.
+ 
+    - name: Archive                                          
+      uses: actions/upload-artifact@v4.3.0 
+      with:
+        name: api                                          
+        path: artifacts
+
+  deliver:
+    name: Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.1.1
+      - name: Download binary
+        uses: actions/download-artifact@v4.1.1
+        with:
+          name: api
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1.1.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+              Still in experimentation phase
+          draft: true
+          prerelease: true
+      - name: Upload Release Binary
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+            upload_url:
+              ${{ steps.create_release.outputs.upload_url }}   
+            asset_path: api
+            asset_name: api
+            asset_content_type: application/octet-stream
+  
+  deploy-function:
+    name: Deploy FaaS
+    runs-on: ubuntu-latest
+    needs: build
+    # if: ${{ github.event_name == 'push' && github.ref == 'refs/head/main' }}
+    steps:
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v4 
+      with:
+        fetch-depth: 0
+    - name: Google Auth
+      id: auth
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: ${{ secrets.gcp_credentials }}
+    - name: Deploy function
+      id: deploy
+      uses: google-github-actions/deploy-cloud-functions@main
+      with:
+          name: translate
+          entry_point: Translate
+          runtime: go121         
+    - id: test
+      run: curl "${{ steps.deploy.outputs.url }}/hello"
+  
