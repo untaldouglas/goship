@@ -97,7 +97,7 @@ jobs:
     name: Deploy FaaS
     runs-on: ubuntu-latest
     needs: build
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/head/main' }}
+    
     steps:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v4 
