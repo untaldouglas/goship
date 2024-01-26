@@ -97,7 +97,7 @@ jobs:
     name: Deploy FaaS
     runs-on: ubuntu-latest
     needs: build
-    
+    # if: ${{ github.event_name == 'push' && github.ref == 'refs/head/main' }}
     steps:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v4 
@@ -105,7 +105,7 @@ jobs:
         fetch-depth: 0
     - name: Google Auth
       id: auth
-      uses: 'google-github-actions/auth@v0'
+      uses: 'google-github-actions/auth@main'
       with:
         credentials_json: ${{ secrets.gcp_credentials }}
     - name: Deploy function
