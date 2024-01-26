@@ -117,3 +117,4 @@ jobs:
           runtime: go121         
     - id: test
       run: curl "${{ steps.deploy.outputs.url }}/hello"
+  
