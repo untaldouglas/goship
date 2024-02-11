@@ -1,4 +1,4 @@
-GO_VERSION := 1.21.6
+GO_VERSION := 1.22.0
 
 .DEFAULT_GOAL := build
 .PHONY:fmt vet build
@@ -11,8 +11,8 @@ install-go:
 	rm go$(GO_VERSION).linux-amd64.tar.gz
 
 init-go: 
-    echo 'export PATH=$$PATH:/usr/local/go/bin' >> $${HOME}/.bashrc
-    echo 'export PATH=$$PATH:$${HOME}/go/bin' >> $${HOME}/.bashrc
+    echo 'export PATH=$$PATH:/usr/local/go/bin' >> $${HOME}/.profile
+    echo 'export PATH=$$PATH:$${HOME}/go/bin' >> $${HOME}/.profile
 
 upgrade-go: 
 	sudo rm -rf /usr/bin/go
